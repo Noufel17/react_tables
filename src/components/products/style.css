@@ -4,22 +4,27 @@
 
 @layer components {
   .table_wrapper {
-    @apply overflow-auto rounded-md shadow-md;
+    @apply table-fixed text-base rounded-md shadow-md;
   }
   .table_wrapper table {
     @apply border-collapse  border-hidden w-auto max-w-full table-auto;
   }
   .head {
-    @apply items-center bg-[#F2F2F2] text-sm h-8;
+    @apply bg-[rgba(223,208,242)] text-sm;
   }
-  .head th {
-    @apply text-left p-4;
+  th {
+    @apply text-left px-4 py-2;
   }
+
   .table_wrapper td {
     @apply p-4 min-w-[90px] border-l-[2px] border-r-[2px] border-r-[#F3F3F3] 
     border-l-[#F3F3F3] text-left;
   }
   .table_wrapper tr {
-    @apply even:bg-[rgba(242,242,242,0.6)];
+    @apply even:bg-[rgba(223,208,242,0.4)];
+  }
+  .journal_btn {
+    @apply h-10 w-10  bg-[#F2F2F2] rounded-lg shadow-md text-center
+     flex justify-center items-center hover:shadow-xl;
   }
 }

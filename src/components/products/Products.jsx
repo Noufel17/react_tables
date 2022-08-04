@@ -1,61 +1,13 @@
 import React from "react";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { useTable } from "react-table";
+import { useTable, useSortBy } from "react-table";
 import { useMemo } from "react";
 import "./style.css";
+import Journal from "./svgs/Journal";
+import ArrowDown from "./svgs/ArrowDown";
+import ArrowUp from "./svgs/ArrowUp";
 function Products(props) {
-  // const data = useMemo(
-  //   () => [
-  //     {
-  //       id: 1,
-  //       title: "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
-  //       price: 109.95,
-  //       description:
-  //         "Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday",
-  //       category: "men's clothing",
-  //       image: "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
-  //       rating: {
-  //         rate: 3.9,
-  //         count: 120,
-  //       },
-  //     },
-  //     {
-  //       id: 1,
-  //       title: "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
-  //       price: 109.95,
-  //       description:
-  //         "Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday",
-  //       category: "men's clothing",
-  //       image: "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
-  //       rating: {
-  //         rate: 3.9,
-  //         count: 120,
-  //       },
-  //     },
-  //   ],
-  //   []
-  // );
-  // const columns = useMemo(
-  //   () => [
-  //     {
-  //       header: "Id",
-  //       accessor: "id",
-  //       //there is always a cell property that contains a function that get called
-  //       //when rendering that you can override
-  //     },
-  //     {
-  //       header: "Title",
-  //       accessor: "title",
-  //     },
-  //     {
-  //       header: "Price",
-  //       accessor: "price",
-  //     },
-  //   ],
-  //   []
-  // );
-
   const [products, setProducts] = useState([]);
   const fetchProductsData = async () => {
     const response = await axios
@@ -80,7 +32,33 @@ function Products(props) {
         : [],
     [products]
   );
-  const table = useTable({ columns: productsColumns, data: productsData });
+
+  const tableHooks = (hooks) => {
+    hooks.visibleColumns.push((columns) => [
+      ...columns,
+      {
+        id: "journal",
+        header: "journal",
+        Cell: ({ row }) => (
+          <button
+            className="journal_btn"
+            onClick={() => {
+              alert("editing product with id :", row.values.id);
+            }}
+          >
+            <div>
+              <Journal />
+            </div>
+          </button>
+        ),
+      },
+    ]);
+  };
+  const table = useTable(
+    { columns: productsColumns, data: productsData },
+    tableHooks,
+    useSortBy
+  );
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     table;
@@ -96,8 +74,22 @@ function Products(props) {
           {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column, index) => (
-                <th key={index} {...column.getHeaderProps()}>
-                  {column.render("header")}
+                <th
+                  key={index}
+                  {...column.getHeaderProps(column.getSortByToggleProps())}
+                >
+                  <div className="flex flex-row items-center">
+                    {column.render("header")}
+                    {column.isSorted ? (
+                      column.isSortedDesc ? (
+                        <ArrowDown />
+                      ) : (
+                        <ArrowUp />
+                      )
+                    ) : (
+                      <ArrowDown />
+                    )}
+                  </div>
                 </th>
               ))}
             </tr>
