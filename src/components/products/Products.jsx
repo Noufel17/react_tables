@@ -1,12 +1,13 @@
 import React from "react";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { useTable, useSortBy } from "react-table";
+import { useTable, useSortBy, useGlobalFilter } from "react-table";
 import { useMemo } from "react";
 import "./style.css";
-import Journal from "./svgs/Journal";
-import ArrowDown from "./svgs/ArrowDown";
-import ArrowUp from "./svgs/ArrowUp";
+import Journal from "../../svgs/Journal";
+import ArrowDown from "../../svgs/ArrowDown";
+import ArrowUp from "../../svgs/ArrowUp";
+import GlobalFilter from "./GlobalFilter";
 function Products(props) {
   const [products, setProducts] = useState([]);
   const fetchProductsData = async () => {
@@ -27,7 +28,14 @@ function Products(props) {
         ? Object.keys(products[0])
             .filter((key) => key !== "rating")
             .map((key) => {
-              return { header: key, accessor: key };
+              if (key === "image") {
+                return {
+                  Header: key,
+                  accessor: key,
+                  Cell: ({ value }) => <img src={value} alt={key} />,
+                };
+              }
+              return { Header: key, accessor: key };
             })
         : [],
     [products]
@@ -38,7 +46,7 @@ function Products(props) {
       ...columns,
       {
         id: "journal",
-        header: "journal",
+        Header: "journal",
         Cell: ({ row }) => (
           <button
             className="journal_btn"
@@ -56,61 +64,84 @@ function Products(props) {
   };
   const table = useTable(
     { columns: productsColumns, data: productsData },
+    useGlobalFilter,
     tableHooks,
     useSortBy
   );
 
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    table;
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    preGlobalFilteredRows,
+    setGlobalFilter,
+    state,
+  } = table;
 
   useEffect(() => {
     fetchProductsData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <div className="table_wrapper">
-      <table {...getTableProps()}>
-        <thead className="head">
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column, index) => (
-                <th
-                  key={index}
-                  {...column.getHeaderProps(column.getSortByToggleProps())}
-                >
-                  <div className="flex flex-row items-center">
-                    {column.render("header")}
-                    {column.isSorted ? (
-                      column.isSortedDesc ? (
-                        <ArrowDown />
+    <>
+      <div className="w-full flex justify-start items-center ">
+        <GlobalFilter
+          preGlobalFilteredRows={preGlobalFilteredRows}
+          globalFilter={state.globalFilter}
+          setGlobalFilter={setGlobalFilter}
+        />
+      </div>
+
+      <div className="table_wrapper">
+        <table {...getTableProps()}>
+          <thead className="head">
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column, index) => (
+                  <th
+                    key={index}
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                  >
+                    <div className="flex flex-row items-center">
+                      {column.render("Header")}
+                      {column.Header !== "journal" ? (
+                        column.isSorted ? (
+                          column.isSortedDesc ? (
+                            <ArrowDown />
+                          ) : (
+                            <ArrowUp />
+                          )
+                        ) : (
+                          <ArrowDown />
+                        )
                       ) : (
-                        <ArrowUp />
-                      )
-                    ) : (
-                      <ArrowDown />
-                    )}
-                  </div>
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row, index) => {
-            prepareRow(row);
-            return (
-              <tr key={index} {...row.getRowProps()}>
-                {row.cells.map((cell, index) => (
-                  <td key={index} {...cell.getCellProps()}>
-                    {cell.render("Cell")}
-                  </td>
+                        ""
+                      )}
+                    </div>
+                  </th>
                 ))}
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {rows.map((row, index) => {
+              prepareRow(row);
+              return (
+                <tr key={index} {...row.getRowProps()}>
+                  {row.cells.map((cell, index) => (
+                    <td key={index} {...cell.getCellProps()}>
+                      {cell.render("Cell")}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
 
