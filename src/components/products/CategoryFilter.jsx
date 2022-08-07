@@ -13,7 +13,7 @@ function CategoryFilter({ setColumnFilterValue, preFilteredRows: { length } }) {
     <div className="h-12 w-1/6 rounded-md bg-[#F2F2F2] flex items-center p-4 mb-4 cursor-pointer text-left text-bold ">
       <select
         // couldn't display length has to make it happen
-        className="bg-transparent w-full"
+        className=" bg-transparent appearance-none w-full leading-tight focus:outline-none "
         value={value}
         defaultValue={"all"}
         onChange={(event) => {

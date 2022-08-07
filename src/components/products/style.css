@@ -42,4 +42,7 @@
       focus:outline-none focus:ring-0 
      active:bg-[rgba(223,208,242)] active:shadow-lg transition duration-75 ease-in-out;
   }
+  .options_wrapper {
+    @apply h-64 w-60 flex flex-col justify-evenly shadow-md rounded-md;
+  }
 }
